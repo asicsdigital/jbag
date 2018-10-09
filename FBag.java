@@ -7,7 +7,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BinaryFunction;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,11 +37,11 @@ public class FBag
    /**
     * Folds over the elements in this bag
     */
-   public static <T> T reduce(final FBag bag, final T identity, final BinaryFunction<T, Integer> accumulator)
+   public static <T> T reduce(final FBag bag, final T identity, final BiFunction<T, Integer,T > accumulator, BinaryOperator<T> combiner)
    {
-      return bag.elements.stream().reduce(identity, accumulator);
+      return bag.elements.stream().reduce(identity, accumulator,combiner);
    }
-   
+
    /**
     * The number of elements in the bag
     */
@@ -62,7 +63,7 @@ public class FBag
     */
    public static int count(final FBag bag, final Integer elem)
    {
-      return bag.elements.stream().filter(elem::equals).count();
+      return (int) bag.elements.stream().filter(elem::equals).count();
    }
 
    /**
@@ -73,7 +74,7 @@ public class FBag
       final List<Integer> newElements = new ArrayList<Integer>(bag.elements);
       newElements.remove(elem);
 
-      return new BagV(newElements);
+      return new FBag(newElements);
    }
 
    /**
@@ -81,7 +82,7 @@ public class FBag
     */
    public static void write(final OutputStream os, final FBag bag)
    {
-      new PrintStream(os, true).println(bag.elements.stream().collect(Collectors.joining(",", "[", "]")));
+      new PrintStream(os, true).println(bag.elements.stream().map(String::valueOf).collect(Collectors.joining(",", "[", "]")));
    }
 
    /**
@@ -89,7 +90,7 @@ public class FBag
     */
    public static FBag union(final FBag to, final FBag from)
    {
-      return from.elements.stream().reduce(to, (result, elem) -> result.put(elem));
+      return from.elements.stream().reduce(to, FBag::put, FBag::union);
    }
 
    /**
@@ -97,7 +98,7 @@ public class FBag
     */
    public static boolean isSubbag(final FBag a, final FBag b)
    {
-      return a.elements.stream().map(elem -> a.count(elem) == b.count(elem)).reduce(true, Boolean::logicalAnd);
+      return a.elements.stream().map(elem -> a.count(a, elem) == b.count(b,elem)).reduce(true, Boolean::logicalAnd);
    }
 
    /**
@@ -116,7 +117,7 @@ public class FBag
    {
       return isSubbag(a, b) && isSuperbag(a, b);
    }
-   
+
    ////////////////////////////////////////////////////////////////////////////
    //
    // Private implementation

@@ -26,7 +26,7 @@ public class SetV extends BagV
    {
       if (!memberOf(elem))
       {
-         return super.put(elem);
+         return (SetV) super.put(elem);
       }
 
       else

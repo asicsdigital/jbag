@@ -31,13 +31,13 @@ public class FSet extends FBag
    {
       return count(set, elem) > 0;
    }
-   
+
    ////////////////////////////////////////////////////////////////////////////
    //
    // Private implementation
    //
    private static FBag removeDuplicates(final FBag bag)
    {
-      return reduce(bag, new FBag(), (result, elem) -> (count(result, elem) > 0) ? result : put(result, elem));
+      return reduce(bag, new FBag(), (result, elem) -> (count(result, elem) > 0) ? result : put(result, elem),FBag::union);
    }
 }
