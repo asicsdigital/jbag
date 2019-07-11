@@ -23,7 +23,7 @@ public class BagV
    {
       this(Collections.emptyList());
    }
-   
+
    /**
     * The number of elements in the bag
     */
@@ -45,7 +45,7 @@ public class BagV
     */
    public int count(final Integer elem)
    {
-      return elements.stream().filter(elem::equals).count();
+      return (int) elements.stream().filter(elem::equals).count();
    }
 
    /**
@@ -74,7 +74,7 @@ public class BagV
     */
    public static void write(final OutputStream os, final BagV bag)
    {
-      new PrintStream(os, true).println(bag.stream().collect(Collectors.joining(",", "[", "]")));
+      new PrintStream(os, true).println(bag.stream().map(String::valueOf).collect(Collectors.joining(",", "[", "]")));
    }
 
    /**
@@ -84,7 +84,7 @@ public class BagV
     */
    public static BagV union(final BagV to, final BagV from)
    {
-      return from.reduce(to, (result, elem) -> result.put(elem));
+      return from.elements.stream().reduce(to, BagV::put, BagV::union);
    }
 
    /**
@@ -117,7 +117,7 @@ public class BagV
    {
       return isSubbag(a, b) && isSuperbag(a, b);
    }
-   
+
    ////////////////////////////////////////////////////////////////////////////
    //
    // Private implementation
@@ -126,6 +126,6 @@ public class BagV
    {
       this.elements = Collections.unmodifiableList(elements);
    }
-   
+
    private final List<Integer> elements;
 }

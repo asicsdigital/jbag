@@ -5,7 +5,6 @@
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +22,7 @@ public class JBag implements Cloneable, Iterable<Integer>
    {
       this(new ArrayList<Integer>());
    }
-   
+
    /**
     * The number of elements in the bag
     */
@@ -37,7 +36,7 @@ public class JBag implements Cloneable, Iterable<Integer>
     */
    public void put(final Integer elem)
    {
-      elements.put(elem);
+      elements.add(elem);
    }
 
    /**
@@ -45,7 +44,7 @@ public class JBag implements Cloneable, Iterable<Integer>
     */
    public int count(final Integer elem)
    {
-      return elements.stream().filter(elem::equals).count();
+      return (int) elements.stream().filter(elem::equals).count();
    }
 
    /**
@@ -70,7 +69,7 @@ public class JBag implements Cloneable, Iterable<Integer>
     */
    public JBag clone()
    {
-      return new JBag(elements.clone());
+      return new JBag(new ArrayList<>(elements));
    }
 
    /**
@@ -80,7 +79,7 @@ public class JBag implements Cloneable, Iterable<Integer>
     */
    public static void write(final OutputStream os, final JBag bag)
    {
-      new PrintStream(os, true).println(bag.iterator().stream().collect(Collectors.joining(",", "[", "]")));
+      new PrintStream(os, true).println(bag.elements.stream().map(String::valueOf).collect(Collectors.joining(",", "[", "]")));
    }
 
    /**
@@ -92,7 +91,7 @@ public class JBag implements Cloneable, Iterable<Integer>
     */
    public static void union(final JBag to, final JBag from)
    {
-      from.iterator().stream().forEach(to::put);
+      from.elements.stream().forEach(to::put);
    }
 
    /**
@@ -102,7 +101,7 @@ public class JBag implements Cloneable, Iterable<Integer>
     */
    public static boolean isSubbag(final JBag a, final JBag b)
    {
-      return a.iterator().stream().map(elem -> a.count(elem) <= b.count(elem)).reduce(true, Boolean::logicalAnd);
+      return a.elements.stream().map(elem -> a.count(elem) <= b.count(elem)).reduce(true, Boolean::logicalAnd);
    }
 
    /**
@@ -134,6 +133,6 @@ public class JBag implements Cloneable, Iterable<Integer>
    {
       this.elements = elements;
    }
-   
+
    private final List<Integer> elements;
 }
